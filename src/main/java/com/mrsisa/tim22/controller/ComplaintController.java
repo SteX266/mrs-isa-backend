@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 
 @RestController
-@CrossOrigin(origins = {"*"}, allowedHeaders = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping(value = "/complaint", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ComplaintController {
     @Autowired
