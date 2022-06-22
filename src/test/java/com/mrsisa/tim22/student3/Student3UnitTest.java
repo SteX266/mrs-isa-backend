@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest()
-public class UnitTests {
+public class Student3UnitTest {
     @Mock
     private SystemEntityRepository systemEntityRepository;
 
