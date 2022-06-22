@@ -26,7 +26,7 @@ public interface SystemEntityRepository extends JpaRepository<SystemEntity, Inte
     public List<SystemEntity> entitiesBetweenIds(int startId, int endId);
 
 
-    @Lock(LockModeType.PESSIMISTIC_READ)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT e FROM SystemEntity e where e.id=:id")
     @QueryHints({@QueryHint(name = "javax.persistence.lock.timeout", value = "1000")})
     SystemEntity getLockedEntity(Integer id);
