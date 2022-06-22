@@ -34,6 +34,10 @@ public class PromoService {
 
     public boolean createPromoFromDTO(PromoDTO promoDTO ) {
         SystemEntity entity = systemEntityRepository.findOneById(promoDTO.getSystemEntityId());
+
+
+
+
         promoRepository.save(new Promo(promoDTO, entity));
         return true;
     }
