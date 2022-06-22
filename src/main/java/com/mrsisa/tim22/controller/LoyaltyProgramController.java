@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@CrossOrigin(origins = {"*"}, allowedHeaders = "*")
+@CrossOrigin(origins = {"http://localhost:3000"})
 @RequestMapping(value = "/loyalty", produces = MediaType.APPLICATION_JSON_VALUE)
 public class LoyaltyProgramController {
     @Autowired

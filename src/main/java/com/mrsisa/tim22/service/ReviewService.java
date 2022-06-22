@@ -1,9 +1,8 @@
 package com.mrsisa.tim22.service;
 
-import com.mrsisa.tim22.model.Reservation;
-import com.mrsisa.tim22.model.Review;
-import com.mrsisa.tim22.model.SystemEntity;
-import com.mrsisa.tim22.model.User;
+import com.mrsisa.tim22.dto.ReservationReportDTO;
+import com.mrsisa.tim22.dto.ReviewDTO;
+import com.mrsisa.tim22.model.*;
 import com.mrsisa.tim22.repository.ReservationRepository;
 import com.mrsisa.tim22.repository.ReviewRepository;
 import com.mrsisa.tim22.repository.SystemEntityRepository;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 
 @Service
 public class ReviewService {
@@ -24,6 +24,10 @@ public class ReviewService {
     private ReviewRepository reviewRepository;
     @Autowired
     private SystemEntityRepository systemEntityRepository;
+
+    @Autowired
+    private EmailService emailService;
+
 
 
     @Transactional
@@ -57,5 +61,31 @@ public class ReviewService {
         systemEntityRepository.save(entity);
         return true;
 
+    }
+
+    public ArrayList<ReviewDTO> getAllReviws() {
+            ArrayList<ReviewDTO> reportDTOs = new ArrayList<>();
+            ArrayList<Review> reports = (ArrayList<Review>) reviewRepository.findAll();
+            for (Review r: reports) {
+                if(!r.isApproved()) {
+                    reportDTOs.add(new ReviewDTO(r));
+                }
+            }
+            return reportDTOs;
+        }
+
+    public boolean acceptReviw(ReviewDTO dto) {
+        Review rr = reviewRepository.findReviewById(dto.getId());
+        rr.setApproved(true);
+        reviewRepository.save(rr);
+        emailService.sendReviewEmail(rr.getSystemEntity().getOwner().getUsername(),rr.getText(),rr.getClient().getUsername(),rr.getScore(),rr.getSystemEntity().getName());
+        return true;
+    }
+
+    public boolean declineReviw(ReviewDTO dto) {
+        Review rr = reviewRepository.findReviewById(dto.getId());
+        reviewRepository.delete(rr);
+        emailService.sendReservationReportDeclined(dto.getClient(),dto.getOwner(),rr.getText(),dto.getText());
+        return true;
     }
 }

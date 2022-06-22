@@ -29,10 +29,14 @@ public class Complaint {
     @Column
     private String responseText;
 
+    @Column
+    private boolean isAnswered;
+
     public Complaint(String text, User sender, SystemEntity systemEntity){
         this.text = text;
         this.sender = sender;
         this.systemEntity = systemEntity;
+        this.isAnswered= false;
     }
 
 }

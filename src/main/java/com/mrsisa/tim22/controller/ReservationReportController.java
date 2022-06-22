@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 
 @RestController
-@CrossOrigin(origins = {"*"}, allowedHeaders = "*")
+@CrossOrigin(origins = {"http://localhost:3000"}, allowedHeaders = "*")
 @RequestMapping(value = "/reservationReport", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ReservationReportController {
 

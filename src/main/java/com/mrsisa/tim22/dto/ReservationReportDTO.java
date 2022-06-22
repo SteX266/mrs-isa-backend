@@ -1,8 +1,5 @@
 package com.mrsisa.tim22.dto;
-import com.mrsisa.tim22.model.AccountCancellationRequest;
-import com.mrsisa.tim22.model.Reservation;
-import com.mrsisa.tim22.model.ReservationReport;
-import com.mrsisa.tim22.model.User;
+import com.mrsisa.tim22.model.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,12 +22,7 @@ public class ReservationReportDTO {
     private String text;
 
 
-
-
-
-
-
-    public ReservationReportDTO(ReservationReport acr){
+    public ReservationReportDTO(ReservationReport acr) {
         this.text = acr.getText();
         this.id = acr.getId();
         this.client = acr.getClient().getUsername();
@@ -38,6 +30,11 @@ public class ReservationReportDTO {
         this.reservation = acr.getReservation().getSystemEntity().getName();
     }
 
-
-
+    public ReservationReportDTO(Complaint acr) {
+        this.text = acr.getText();
+        this.id = acr.getId();
+        this.client = acr.getSender().getUsername();
+        this.owner = acr.getSystemEntity().getOwner().getUsername();
+        this.reservation = acr.getSystemEntity().getName();
+    }
 }

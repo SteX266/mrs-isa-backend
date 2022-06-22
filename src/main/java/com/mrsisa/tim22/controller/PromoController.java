@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 
 @RestController
-@CrossOrigin(origins = {"*"}, allowedHeaders = "*")
+@CrossOrigin(origins = {"http://localhost:3000"})
 @RequestMapping(value = "/promo", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PromoController {
 

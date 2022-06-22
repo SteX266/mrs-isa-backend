@@ -92,19 +92,20 @@ public class UserService {
         // u primeru se registruju samo obicni korisnici i u skladu sa tim im se i dodeljuje samo rola USER
         List<Role> roles;
         if(userRequest.getUserType().equals("client")){
-            roles = roleService.findByName("CLIENT");
+            roles = roleService.findByName("ROLE_CLIENT");
         }
         else if(userRequest.getUserType().equals("vacation")){
-            roles = roleService.findByName("VACATION_OWNER");
+            roles = roleService.findByName("ROLE_VACATION_OWNER");
         }
         else if(userRequest.getUserType().equals("vessel")){
-            roles = roleService.findByName("SHIP_OWNER");
+            roles = roleService.findByName("ROLE_SHIP_OWNER");
         }
         else if(userRequest.getUserType().equals("instructor")){
-            roles = roleService.findByName("INSTRUCTOR");
+            roles = roleService.findByName("ROLE_INSTRUCTOR");
         }
         else{
-            roles = roleService.findByName("ADMIN");
+            roles = roleService.findByName("ROLE_ADMIN");
+            u.setEnabled(true);
 
         }
         u.setRoles(roles);

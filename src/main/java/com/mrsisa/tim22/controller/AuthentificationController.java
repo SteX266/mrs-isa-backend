@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = {"*"}, allowedHeaders = "*")
+@CrossOrigin(origins = {"http://localhost:3000"})
 @RequestMapping(value = "/auth")
 public class AuthentificationController {
 

@@ -36,15 +36,15 @@ public class Student1UnitTest {
 
     @Test
     public void cancelingFalseReservation(){
-       Reservation r = new Reservation();
-       r.setDateFrom(LocalDateTime.now().plusDays(2));
-       User u = new User();
-       r.setClient(u);
+        Reservation r = new Reservation();
+        r.setDateFrom(LocalDateTime.now().plusDays(2));
+        User u = new User();
+        r.setClient(u);
 
-       when(reservationRepository.findOneById(1)).thenReturn(r);
-       boolean canCancel = reservationService.cancelReservation(1);
+        when(reservationRepository.findOneById(1)).thenReturn(r);
+        boolean canCancel = reservationService.cancelReservation(1);
 
-       assertFalse(canCancel);
+        assertFalse(canCancel);
     }
 
     @Test

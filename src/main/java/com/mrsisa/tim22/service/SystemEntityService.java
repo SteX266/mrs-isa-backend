@@ -11,12 +11,14 @@ import com.mrsisa.tim22.repository.ReservationRepository;
 import com.mrsisa.tim22.repository.SystemEntityRepository;
 import com.mrsisa.tim22.repository.UserRepository;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.parser.Entity;
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -248,19 +250,26 @@ public class SystemEntityService {
     }
 
     public SystemEntityDTO getWorstRated() {
-        SystemEntity id = null;
-        double worst = 5;
+
         UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         String email = user.getUsername();
+        SystemEntity id = getWorstRatedUsersEntity(email);
+
+        return new SystemEntityDTO(id);
+    }
+
+
+    public SystemEntity getWorstRatedUsersEntity(String email) {
+        SystemEntity id = null;
+        double worst = 5;
         for (SystemEntity e : systemEntityRepository.findSystemEntitiesByOwner_Username(email)) {
             if (e.getAverageScore() < worst) {
                 worst = e.getAverageScore();
                 id = e;
             }
         }
-
-        return new SystemEntityDTO(id);
+        return id;
     }
 
     public List<ReservationsReportDTO> getReservationsAmountMonthly() {
@@ -376,7 +385,7 @@ public class SystemEntityService {
         id++;
         return id;
     }
-    public boolean saveVessel(VesselDTO vesselDTO) {
+    public Vessel saveVessel(VesselDTO vesselDTO) {
         User u = getCurrentUser();
         Address address = new Address(vesselDTO.getCity(), vesselDTO.getCountry(), vesselDTO.getStreetName(), vesselDTO.getStreetNumber());
         Vessel vessel = new Vessel(vesselDTO);
@@ -396,9 +405,9 @@ public class SystemEntityService {
         vessel.setPhotos(photos);
 
         addressRepository.save(address);
-        vesselRepository.save(vessel);
+        Vessel vessel1 = vesselRepository.save(vessel);
         availabilityPeriodRepository.saveAll(availabilityPeriods);
-        return true;
+        return vessel1;
     }
 
     private List<String> createImages(List<String> photos) throws IOException {
@@ -550,7 +559,7 @@ public class SystemEntityService {
         systemEntityRepository.save(entity);
         return true;
     }
-    public boolean editGeneral(GeneralDTO generalDTO) {
+    public SystemEntity editGeneral(GeneralDTO generalDTO) {
         SystemEntity entity = systemEntityRepository.findOneById(generalDTO.getServiceID());
         entity.setName(generalDTO.getName());
         entity.setDescription(generalDTO.getDescription());
@@ -558,21 +567,26 @@ public class SystemEntityService {
         entity.setPrice(generalDTO.getPrice());
         entity.setCancellationFee(generalDTO.getCancellationFee());
         entity.setCapacity(generalDTO.getCapacity());
-        systemEntityRepository.save(entity);
-        return true;
+        return systemEntityRepository.save(entity);
     }
 
+    @Transactional
     public boolean editAvailabilityPeriod(PeriodsDTO periodsDTO) {
-        SystemEntity entity = systemEntityRepository.findOneById(periodsDTO.getServiceID());
+        SystemEntity entity = systemEntityRepository.getLockedEntity(periodsDTO.getServiceID());
 
         Set<AvailabilityPeriod> availabilityPeriods = entity.getAvailabilityPeriod();
+        for(AvailabilityPeriod period: availabilityPeriods) {
+            if(!reservationService.isEntityAvailable(entity, period.getDateFrom(), period.getDateTo())) {
+                return false;
+            }
+        }
         availabilityPeriodRepository.deleteAll(availabilityPeriods);
         Set<AvailabilityPeriod> newAvailabilityPeriods = createAvailabilityPeriods(periodsDTO.getAvailabilityPeriodDTOS(), entity);
         availabilityPeriodRepository.saveAll(newAvailabilityPeriods);
         systemEntityRepository.save(entity);
         return true;
     }
-    public boolean editAddress(AddressDTO addressDTO) {
+    public SystemEntity editAddress(AddressDTO addressDTO) {
         SystemEntity entity = systemEntityRepository.findOneById(addressDTO.getServiceID());
         Address oldAddress = addressRepository.getOne(entity.getAddress().getId());
         oldAddress.removeSystemEntity(entity);
@@ -582,16 +596,16 @@ public class SystemEntityService {
         entity.setAddress(newAddress);
         newAddress.addSystemEntity(entity);
         addressRepository.save(newAddress);
-        systemEntityRepository.save(entity);
-        return true;
+        return systemEntityRepository.save(entity);
     }
-    public boolean editVesselDetails(VesselDetailsDTO detailsDTO) {
+
+    public Vessel editVesselDetails(VesselDetailsDTO detailsDTO) {
+        if(detailsDTO.getServiceID() == null) return null;
         Vessel vessel = vesselRepository.findVesselById(detailsDTO.getServiceID());
         vessel.setMaxSpeed(detailsDTO.getMaxSpeed());
         vessel.setEngineNumber(detailsDTO.getEngineNumber());
         vessel.setEnginePower(detailsDTO.getEnginePower());
-        vesselRepository.save(vessel);
-        return true;
+        return vesselRepository.save(vessel);
     }
 
 
