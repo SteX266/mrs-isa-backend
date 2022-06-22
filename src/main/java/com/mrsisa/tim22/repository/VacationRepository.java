@@ -13,7 +13,7 @@ import javax.persistence.QueryHint;
 public interface VacationRepository extends JpaRepository<Vacation, Long> {
     public Vacation findVacationById(int id);
 
-    @Lock(LockModeType.PESSIMISTIC_READ)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT v FROM Vacation v where v.id=:id")
     @QueryHints({@QueryHint(name = "javax.persistence.lock.timeout", value = "1000")})
     Vacation getLockedEntity(Integer id);
